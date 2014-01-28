@@ -1,0 +1,40 @@
+<html>
+<head>
+    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="https://api.trello.com/1/client.js?key=11d0f0ce0e152c29b2fc61031c5fc229"></script>
+</head>
+<body>
+    <ul id="news"></ul>
+
+    <script>
+    (function(global) {
+        "use strict";
+
+        var container = document.querySelector('#news');
+
+        var Board = function Board () {
+            this.loadCards = function (callback) {
+                var path = "boards/52e7cfd2f5f21b1b1033a645/cards";
+                Trello.get(path, function (data) {
+                    callback(data);
+                });
+            }
+        }
+
+        Trello.authorize({
+            success: function () {
+                var board = new Board();
+                board.loadCards(function (cards) {
+                    var liCard;
+                    cards.forEach(function (card) {
+                        liCard = document.createElement('li');
+                        liCard.innerHTML = card.name;
+                        container.appendChild(liCard);
+                    });
+                });
+            }
+        });
+    }(this));
+    </script>
+</body>
+</html>
