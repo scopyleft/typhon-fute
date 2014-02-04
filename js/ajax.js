@@ -1,8 +1,7 @@
 (function (global) {
     "use strict";
-    var Ajax = function (url, callback) {
-
-        this.get = function (url, callbackSuccess, callbackError) {
+    var Ajax = {
+        get: function (url, callbackSuccess, callbackError) {
             var http = new XMLHttpRequest();
             http.open('GET', url);
             http.send();
@@ -16,6 +15,7 @@
                 }
             }
         }
-    }
+    };
+
     global.Ajax = Ajax;
 })(this);

@@ -1,37 +1,101 @@
 <html>
-
 <head>
     <meta charset="utf-8" />
     <title>Typhon Futé</title>
-    <script src="./js/ajax.js"></script>
+    <script src="/js/ajax.js"></script>
+    <script src="/js/marked.js"></script>
+    <link rel="stylesheet" href="/css/main.css" />
 </head>
 
 <body>
-    <ul id="news"></ul>
+    <header>
+        <h1>Situation : <span id="intensity"></span> <span id="tendency"></span></h1>
+    </header>
+
+    <main>
+        <section id="news"></section>
+    </main>
 
     <script>
     (function(global) {
         "use strict";
 
-        var container = document.querySelector('#news');
-
-        var Data = {
-            getNews: function(callback) {
-                var http = new Ajax();
-                http.get("https://api.trello.com/1/boards/52e7cfd2f5f21b1b1033a645/cards?key=11d0f0ce0e152c29b2fc61031c5fc229",
-                    function (data) {
-                        callback(data);
-                    });
-            }
+        /**
+        * Clean <p></p> from marked.
+        */
+        function markdown (str, opt, callback) {
+            var ret = marked(str, opt, callback);
+            return ret.substr(3, ret.length - 8);
         }
 
-        Data.getNews(function (cards) {
-            var liCard;
+        // Declarations.
+        // HTML container
+        var containers = {
+            news: document.querySelector('#news'),
+            tendency: document.querySelector('#tendency'),
+            intensity: document.querySelector('#intensity'),
+        };
+        // System conf
+        var conf = {
+            debug:  location.hash.indexOf('debug') >= 0,
+            publishedListId: "52e7cfd2f5f21b1b1033a646",
+        };
+        conf.url = conf.debug
+                   ? "/fixture.json"
+                   : "https://api.trello.com/1/boards/52e7cfd2f5f21b1b1033a645/cards?key=11d0f0ce0e152c29b2fc61031c5fc229";
+
+        /**
+        * Model can retrieve data and treat it.
+        */
+        var Model = {
+            meta: {
+                all: function (callback) {
+                    Ajax.get(conf.url, function (data) {
+                        var filtered = data.filter(function(d) {
+                            return d.name.substr(0, 6).toLowerCase() === '__meta';
+                        });
+                        var prepared = {
+                            tendency: filtered[0].desc[0] == '-' ? 'down' : 'up',
+                            intensity: filtered[0].desc[1]
+                        };
+                        callback(prepared);
+                    });
+                }
+            },
+            news: {
+                all: function(callback) {
+                    Ajax.get(conf.url, function (data) {
+                        var filtered = data.filter(function(d) {
+                            return d.idList === conf.publishedListId
+                                && d.name.substr(0, 6).toLowerCase() !== '__meta';
+                        });
+                        callback(filtered);
+                    });
+                }
+            }
+        };
+
+        // Rendering.
+        Model.news.all(function (cards) {
+            var newsItem, content, links;
             cards.forEach(function (card) {
-                liCard = document.createElement('li');
-                liCard.innerHTML = card.name;
-                container.appendChild(liCard);
+                newsItem = document.createElement('article');
+                content = {
+                    title: markdown(card.name),
+                    body: markdown(card.desc)
+                };
+                newsItem.innerHTML = "<h1>{title}</h1>".replace('{title}',
+                    content.title);
+                if (content.body)
+                    newsItem.innerHTML += "<p>{body}</p>".replace('{body}',
+                        content.body);
+                containers.news.appendChild(newsItem);
             });
+        });
+
+        Model.meta.all(function (meta) {
+            containers.tendency.innerHTML = meta.tendency === 'down' ? "⬇︎" : "⬆︎";
+            containers.intensity.innerHTML = meta.intensity;
         });
     }(this));
     </script>

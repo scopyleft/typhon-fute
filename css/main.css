@@ -1,0 +1,19 @@
+body {
+    font-family: Helvetica, Sans-Serif;
+}
+
+header {
+    border-bottom: 2px solid #999;
+}
+
+#news article {
+    border-bottom: 1px dotted #999;
+}
+
+#news article h1 {
+    font-size: 1.3em;
+}
+
+#news article p {
+    font-size: 1em;
+}
