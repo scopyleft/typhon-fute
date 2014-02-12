@@ -1,0 +1,24 @@
+#news article {
+    background-color: rgb(242, 242, 242);
+    border-bottom: 1px solid rgb(220, 220, 220);
+    padding: 1% 2%;
+    overflow: hidden;
+}
+#news article:hover {
+    background-color: rgb(255, 255, 255);
+}
+
+#news article h1 {
+    font-size: 1.0em;
+    margin: .5em 0;
+    font-weight: normal;
+}
+#news article h1::first-line {
+    font-size: 1.5em;
+    margin: .5em 0;
+    font-weight: bold;
+}
+
+#news article p {
+    font-size: 1em;
+}

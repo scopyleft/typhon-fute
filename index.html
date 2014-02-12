@@ -4,12 +4,17 @@
     <title>Typhon Futé</title>
     <script src="/js/ajax.js"></script>
     <script src="/js/marked.js"></script>
+    <link href="http://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="/css/main.css" />
+    <link rel="stylesheet" href="/css/list.css" />
 </head>
 
 <body>
     <header>
-        <h1>Situation : <span id="intensity"></span> <span id="tendency"></span></h1>
+        <div class="wrapper">
+            <h1><img src="./images/logo.png" alt="Typhon Futé" /></h1>
+            <h2>Montpellier<span id="tendency"></span><span id="intensity">?</span></h2>
+        </div>
     </header>
 
     <main>
@@ -94,7 +99,7 @@
         });
 
         Model.meta.all(function (meta) {
-            containers.tendency.innerHTML = meta.tendency === 'down' ? "⬇︎" : "⬆︎";
+            containers.tendency.innerHTML = meta.tendency === 'down' ? "crue en baisse" : "crue en hausse";
             containers.intensity.innerHTML = meta.intensity;
         });
     }(this));
