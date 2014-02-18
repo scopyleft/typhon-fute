@@ -1,11 +1,13 @@
 #news article {
-    background-color: rgb(242, 242, 242);
     border-bottom: 1px solid rgb(220, 220, 220);
-    padding: 1% 2%;
+    padding: 1% 25px 1% 2%;
     overflow: hidden;
+    background: rgb(242, 242, 242) url('/images/article-arrow.png') no-repeat 98% center;
+    background-size: 13px;
 }
-#news article:hover {
+#news article.selected {
     background-color: rgb(255, 255, 255);
+    background-image: none;
 }
 
 #news article h1 {
@@ -14,11 +16,15 @@
     font-weight: normal;
 }
 #news article h1::first-line {
-    font-size: 1.5em;
+    font-size: 1.2em;
     margin: .5em 0;
     font-weight: bold;
 }
 
 #news article p {
+    display: none;
     font-size: 1em;
+}
+#news article.selected p {
+    display: block;
 }

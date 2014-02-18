@@ -34,13 +34,21 @@
             return ret.substr(3, ret.length - 8);
         }
 
+        var $ = function (element, context) {
+            return (context || document).querySelectorAll(element);
+        }
+        var $$ = function (element, context) {
+            return (context || document).querySelector(element);
+        }
+
         // Declarations.
         // HTML container
         var containers = {
-            news: document.querySelector('#news'),
-            tendency: document.querySelector('#tendency'),
-            intensity: document.querySelector('#intensity'),
+            news: $$('#news'),
+            tendency: $$('#tendency'),
+            intensity: $$('#intensity'),
         };
+
         // System conf
         var conf = {
             debug:  location.hash.indexOf('debug') >= 0,
@@ -92,10 +100,20 @@
                 };
                 newsItem.innerHTML = "<h1>{title}</h1>".replace('{title}',
                     content.title);
-                if (content.body)
+                if (content.body) {
                     newsItem.innerHTML += "<p>{body}</p>".replace('{body}',
                         content.body);
+                }
                 containers.news.appendChild(newsItem);
+
+                // Click to select news article.
+                [].map.call($('#news article'), function (e) {
+                    e.onclick = function () {
+                        var current = $$('article.selected');
+                        if(current) current.classList.remove('selected');
+                        this.classList.add("selected");
+                    }
+                });
             });
         });
 
