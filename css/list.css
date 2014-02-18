@@ -2,6 +2,9 @@
     border-bottom: 1px solid rgb(220, 220, 220);
     padding: 1% 25px 1% 2%;
     overflow: hidden;
+    background-color: rgb(242, 242, 242);
+}
+#news article.expandable {
     background: rgb(242, 242, 242) url('/images/article-arrow.png') no-repeat 98% center;
     background-size: 13px;
 }
