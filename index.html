@@ -2,12 +2,14 @@
 <head>
     <meta charset="utf-8" />
     <title>Typhon Futé</title>
+    <script src="/js/base.js"></script>
     <script src="/js/ajax.js"></script>
     <script src="/js/marked.js"></script>
+    <script src="/js/models.js"></script>
     <link href="http://fonts.googleapis.com/css?family=Lato" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="/css/main.css" />
     <link rel="stylesheet" href="/css/list.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
 </head>
 
 <body>
@@ -19,35 +21,22 @@
     </header>
 
     <main>
-        <section id="news"></section>
+        <div class="wrapper">
+            <section id="news"></section>
+            <section id="info">
+                <a href="#home" class="page">&lt;</a>
+                <div class="content"></div>
+            </section>
+        </div>
     </main>
+
+    <footer>
+        <a href="#info" class="page">Infos</a>
+    </footer>
 
     <script>
     (function(global) {
         "use strict";
-
-        /**
-        * Clean <p></p> from marked.
-        */
-        function markdown (str, opt, callback) {
-            var ret = marked(str, opt, callback);
-            return ret.substr(3, ret.length - 8);
-        }
-
-        var $ = function (element, context) {
-            return (context || document).querySelectorAll(element);
-        }
-        var $$ = function (element, context) {
-            return (context || document).querySelector(element);
-        }
-
-        // Declarations.
-        // HTML container
-        var containers = {
-            news: $$('#news'),
-            tendency: $$('#tendency'),
-            intensity: $$('#intensity'),
-        };
 
         // System conf
         var conf = {
@@ -57,37 +46,8 @@
         conf.url = conf.debug
                    ? "/fixture.json"
                    : "https://api.trello.com/1/boards/52e7cfd2f5f21b1b1033a645/cards?key=11d0f0ce0e152c29b2fc61031c5fc229";
-
-        /**
-        * Model can retrieve data and treat it.
-        */
-        var Model = {
-            meta: {
-                all: function (callback) {
-                    Ajax.get(conf.url, function (data) {
-                        var filtered = data.filter(function(d) {
-                            return d.name.substr(0, 6).toLowerCase() === '__meta';
-                        });
-                        var prepared = {
-                            tendency: filtered[0].desc[0] == '-' ? 'down' : 'up',
-                            intensity: filtered[0].desc[1]
-                        };
-                        callback(prepared);
-                    });
-                }
-            },
-            news: {
-                all: function(callback) {
-                    Ajax.get(conf.url, function (data) {
-                        var filtered = data.filter(function(d) {
-                            return d.idList === conf.publishedListId
-                                && d.name.substr(0, 6).toLowerCase() !== '__meta';
-                        });
-                        callback(filtered);
-                    });
-                }
-            }
-        };
+        // Init Model object with conf.
+        Model.conf = conf;
 
         // Rendering.
         Model.news.all(function (cards) {
@@ -105,7 +65,7 @@
                         content.body);
                     newsItem.classList.add('expandable');
                 }
-                containers.news.appendChild(newsItem);
+                $$('#news').appendChild(newsItem);
 
                 // Click to select news article.
                 [].map.call($('#news article'), function (e) {
@@ -118,9 +78,22 @@
             });
         });
 
-        Model.meta.all(function (meta) {
-            containers.tendency.innerHTML = meta.tendency === 'down' ? "crue en baisse" : "crue en hausse";
-            containers.intensity.innerHTML = meta.intensity;
+        Model.meta.get(function (data) {
+            $$('#tendency').innerHTML = data.tendency === 'down' ? "crue en baisse" : "crue en hausse";
+            $$('#intensity').innerHTML = data.intensity;
+        });
+
+        Model.info.get(function (data) {
+            $$('#info > .content').innerHTML = markdown(data.desc);
+        });
+
+        // Change page buttons.
+        [].map.call($('a.page'), function(a) {
+            a.onclick = function () {
+                var href = this.getAttribute('href');
+                if(href[0] === '#') href = href.substr(1);
+                $$('body').setAttribute('meta-page', href);
+            }
         });
     }(this));
     </script>
